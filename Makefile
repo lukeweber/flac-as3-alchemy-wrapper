@@ -1,6 +1,6 @@
 CC = gcc
 ARCH=$(PROC)
-CFLAGS+= -Wall 
+CFLAGS+= -Wall -O3
 FLAC_PATH=flac-1.2.1/src/libFLAC/
 CINCLUDE = \
 	-Iinclude/ \
@@ -8,7 +8,7 @@ CINCLUDE = \
 	-I$(FLAC_PATH)/include/ \
 	-Iflac-1.2.1/include/
 
-CC_SWITCHES = -Wall $(CINCLUDE)
+CC_SWITCHES = -Wall -O3 $(CINCLUDE)
 PNAME = flac
 
 SOURCES=\
@@ -40,10 +40,13 @@ OBJ = $(RES_SOURCES:.c=.o)
 all: compile_swc clean
 
 compile_swc: $(OBJ) $(MAIN_OBJ)
+	cd flac-1.2.1
+	./configure --disable-asm --disable-asm-optimizations --disable-sse
+	cd -
 	$(CC) $(CFLAGS) -swc -o $(PNAME).swc $(OBJ) $(MAIN_OBJ)
 
 %.o: %.c
 	$(CC) $(CC_SWITCHES) -c $< -o $@
 
 clean:
-#	rm -f *.o core *.bak *.a *.exe *.exe.bc *.l.bc *.achacks.* *.stackdump *.swc
+	rm -f $(OBJ) $(MAIN_OBJ) core *.bak *.a *.exe *.exe.bc *.l.bc *.achacks.* *.stackdump

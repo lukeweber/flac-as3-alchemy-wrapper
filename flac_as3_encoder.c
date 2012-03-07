@@ -14,7 +14,7 @@ int resetPositionByteArray(AS3_Val byteArray)
 	return 0;
 }
 
-FLAC__StreamEncoderWriteStatus writeByteArray(const FLAC__StreamEncoder *encoder, const FLAC__byte writeBuf[], size_t bytes, unsigned samples, unsigned current_frame, void *src)
+FLAC__StreamEncoderWriteStatus writeByteArray(const FLAC__StreamEncoder* encoder, const FLAC__byte writeBuf[], size_t bytes, unsigned samples, unsigned current_frame, void *src)
 {
 	AS3_ByteArray_writeBytes((AS3_Val)writeBuf, (char *)src, bytes);
 	return FLAC__STREAM_ENCODER_WRITE_STATUS_OK;
@@ -26,7 +26,7 @@ static void encodeForFlash(void * self, AS3_Val args)
 	AS3_Val src, dest;
 	FLAC__StreamEncoder* encoder;
 	int srcLen, remainingBytes, yieldTicks;
-	FLAC__int32 raw_data[1024];
+	FLAC__int32 raw_data[256];
 	FLAC__int32 *channels_array[1];
 	channels_array[0] = raw_data;
 

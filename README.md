@@ -1,1 +1,4 @@
-TODO
+Flac Alchemy Encoder
+=============
+
+### Building
