@@ -1,0 +1,12 @@
+<application xmlns="http://ns.adobe.com/air/application/1.5">
+<id>com.adobe.pid461</id>
+<version>1.0</version>
+<filename>pid461</filename>
+<name>pid461</name>
+<initialWindow>
+<x>0</x>
+<y>0</y>
+<visible>false</visible>
+<content>app.swf</content>
+</initialWindow>
+</application>
