@@ -66,7 +66,8 @@ typedef FLAC__uint32 bwword;
 #ifdef _MSC_VER
 #define SWAP_BE_WORD_TO_HOST(x) local_swap32_(x)
 #else
-#define SWAP_BE_WORD_TO_HOST(x) ntohl(x)
+#define SWAP_BE_WORD_TO_HOST(x) (x<<24|(x&0x0000FF00)<<8|(x&0x00FF0000)>>8|x>>24)
+/*#define SWAP_BE_WORD_TO_HOST(x) ntohl(x)*/
 #endif
 #endif
 

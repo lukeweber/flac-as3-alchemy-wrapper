@@ -3,6 +3,7 @@
 #include <stdio.h>
 #include <string.h>
 #include <FLAC/stream_encoder.h>
+#include "config.h"
 #include "AS3.h"
 
 int resetPositionByteArray(AS3_Val byteArray)
@@ -14,10 +15,35 @@ int resetPositionByteArray(AS3_Val byteArray)
 	return 0;
 }
 
-FLAC__StreamEncoderWriteStatus writeByteArray(const FLAC__StreamEncoder* encoder, const FLAC__byte writeBuf[], size_t bytes, unsigned samples, unsigned current_frame, void *src)
+FLAC__StreamEncoderWriteStatus writeByteArray(const FLAC__StreamEncoder* encoder, const FLAC__byte dataBuffer[], size_t bytes, unsigned samples, unsigned current_frame, void *writeBuf)
 {
-	AS3_ByteArray_writeBytes((AS3_Val)writeBuf, (char *)src, bytes);
+	fprintf(stderr, "bytes completed, %i, frame %i, samples %i, bufferdata %i", bytes, current_frame, samples, dataBuffer[0]);
+	AS3_ByteArray_writeBytes((AS3_Val)writeBuf, (char *)dataBuffer, bytes);
 	return FLAC__STREAM_ENCODER_WRITE_STATUS_OK;
+}
+
+//tell
+FLAC__StreamEncoderTellStatus tellByteArray(const FLAC__StreamEncoder *encoder, FLAC__uint64 *absolute_byte_offset, void *writeBuf)
+{
+	AS3_Val as3position = AS3_GetS((AS3_Val)writeBuf, "position");
+	int position = AS3_IntValue(as3position);
+	AS3_Release(as3position);
+	fprintf(stderr, "tell position %i", position);
+	if((int) position < 0)
+		return FLAC__STREAM_ENCODER_TELL_STATUS_ERROR;
+	else {
+		*absolute_byte_offset = (FLAC__uint64)position;
+		return FLAC__STREAM_ENCODER_TELL_STATUS_OK;
+	}
+}
+
+//seek
+FLAC__StreamEncoderSeekStatus seekByteArray(const FLAC__StreamEncoder *encoder, FLAC__uint64 absolute_byte_offset, void *writeBuf)
+{
+	fprintf(stderr, "seek position %i", (int)absolute_byte_offset);
+	AS3_ByteArray_seek((AS3_Val)writeBuf, (int)absolute_byte_offset, SEEK_SET);
+	//return FLAC__STREAM_ENCODER_SEEK_STATUS_ERROR;
+	return FLAC__STREAM_ENCODER_SEEK_STATUS_OK;
 }
 
 static void encodeForFlash(void * self, AS3_Val args)
@@ -25,26 +51,33 @@ static void encodeForFlash(void * self, AS3_Val args)
 	AS3_Val progress;
 	AS3_Val src, dest;
 	FLAC__StreamEncoder* encoder;
-	int srcLen, remainingBytes, yieldTicks;
-	FLAC__int32 raw_data[256];
+	int srcLen, remainingBytes, bytesRead, yieldTicks;
+	FLAC__int32 raw_data[1024];//32 bit, 1024 * 4
 	FLAC__int32 *channels_array[1];
+	short raw_buffer[1024];
 	channels_array[0] = raw_data;
 
 	AS3_ArrayValue(args, "AS3ValType, AS3ValType, AS3ValType, IntType, IntType", &progress, &src, &dest, &srcLen, &yieldTicks);
-	
+
 	encoder = FLAC__stream_encoder_new();
 	FLAC__stream_encoder_set_channels(encoder, 1);
 	FLAC__stream_encoder_set_bits_per_sample(encoder, 16);
 	FLAC__stream_encoder_set_sample_rate(encoder, 16000);
 	FLAC__stream_encoder_set_total_samples_estimate(encoder, srcLen / sizeof(short));
-	FLAC__stream_encoder_init_stream(encoder, writeByteArray, NULL, NULL, NULL, dest);
+	FLAC__stream_encoder_init_stream(encoder, writeByteArray, seekByteArray, tellByteArray, NULL/*metadata callback*/, dest);
 
 	int i = 0;
-	int bytesRead = 0;
+	bytesRead = 0;
+	remainingBytes = srcLen;
 	resetPositionByteArray(src);
 	while (remainingBytes > 0){
-		bytesRead = AS3_ByteArray_readBytes((void *)raw_data, src, 512 * sizeof(short));
+		bytesRead = AS3_ByteArray_readBytes((void *)raw_buffer, src, 1024 * sizeof(short));
+		int j;
+		for(j = 0; j < bytesRead / sizeof(short); j++){
+			raw_data[j] = (FLAC__int32) raw_buffer[j];
+		}
 		remainingBytes -= bytesRead;
+		fprintf(stderr, "bytes read from src %i", bytesRead);
 		FLAC__stream_encoder_process(encoder, (const FLAC__int32 *const *)channels_array, bytesRead / sizeof(short));
 		if(i % yieldTicks == 0){
 			AS3_CallT(progress, NULL, "IntType", (int)((1 - ((float)remainingBytes / srcLen)) * 100));

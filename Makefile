@@ -3,10 +3,10 @@ ARCH=$(PROC)
 CFLAGS+= -Wall -O3
 FLAC_PATH=flac-1.2.1/src/libFLAC/
 CINCLUDE = \
-	-Iinclude/ \
 	-Iincude/FLAC/ \
 	-I$(FLAC_PATH)/include/ \
-	-Iflac-1.2.1/include/
+	-Iflac-1.2.1/include/ \
+	-Iflac-1.2.1/
 
 CC_SWITCHES = -Wall -O3 $(CINCLUDE)
 PNAME = flac
@@ -36,17 +36,14 @@ MAIN = flac_as3_encoder.c
 MAIN_OBJ = $(MAIN:.c=.o)
 OBJ = $(RES_SOURCES:.c=.o)
 
-
-all: compile_swc clean
+all: compile_swc 
+#clean
 
 compile_swc: $(OBJ) $(MAIN_OBJ)
-	cd flac-1.2.1
-	./configure --disable-asm --disable-asm-optimizations --disable-sse
-	cd -
 	$(CC) $(CFLAGS) -swc -o $(PNAME).swc $(OBJ) $(MAIN_OBJ)
 
 %.o: %.c
-	$(CC) $(CC_SWITCHES) -c $< -o $@
+	$(CC) -include config.h $(CC_SWITCHES) -c $< -o $@
 
 clean:
 	rm -f $(OBJ) $(MAIN_OBJ) core *.bak *.a *.exe *.exe.bc *.l.bc *.achacks.* *.stackdump

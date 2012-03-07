@@ -39,8 +39,8 @@
 #include "private/bitmath.h"
 #include "private/lpc.h"
 #if defined DEBUG || defined FLAC__OVERFLOW_DETECT || defined FLAC__OVERFLOW_DETECT_VERBOSE
-#include <stdio.h>
 #endif
+#include <stdio.h>
 
 #ifndef FLAC__INTEGER_ONLY_LIBRARY
 
