@@ -1,11 +1,11 @@
 CC = gcc
 ARCH=$(PROC)
 CFLAGS+= -Wall -O3
-LIB_FLAC_PATH=flac121/libFlac/
+LIB_FLAC_PATH=./flac121/libFlac/
 CINCLUDE = \
 	-I$(LIB_FLAC_PATH)include/ \
 	-I$(LIB_FLAC_PATH) \
-	-Iflac121/include/ 
+	-I./flac121/include/ 
 
 CC_SWITCHES = -Wall -O3 $(CINCLUDE)
 DEFS= -DHAVE_CONFIG_H
