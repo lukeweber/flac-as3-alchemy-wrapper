@@ -41,12 +41,6 @@ Encode
 	encodedData.endian = Endian.LITTLE_ENDIAN;
 	flacCodec.encode(encodingCompleteHandler, encodingProgressHandler, rawPCMByteArray, encodedData, decodedData.length, yield);
 
-Decode
-
-	decodedData = new ByteArray();
-	decodedData.endian = Endian.LITTLE_ENDIAN;
-	flacCodec.decode(decodingCompleteHandler, decodingProgressHandler, encodedData, decodedData, encodedData.length, yield);
-
 Progress Handler
 
 	function progressHandler(progress:int):void;

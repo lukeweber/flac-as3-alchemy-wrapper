@@ -83,25 +83,6 @@ package net.sourceforge.flac.codec {
 			trace("FLACCodec.encodingProgressHandler(event):", progress);
 			dispatchEvent( new ProgressEvent(ProgressEvent.PROGRESS, false, false, progress, 100));
 		}
-
-		/**
-		 * Called when decoding has finished.
-		 */
-		private function decodingCompleteHandler(event:*):void {
-			trace("FLACCodec.decodingCompleteHandler(event):", event);
-			
-			decodedData.position = 0;
-			dispatchEvent( new FLACEvent(FLACEvent.DECODING_COMPLETE, decodedData, getElapsedTime()) );
-		}
-
-		
-		/**
-		 * Called when the decoding task notifies progress.
-		 */
-		private function decodingProgressHandler(progress:int):void {
-			trace("FLACCodec.decodingProgressHandler(event):", progress);
-			dispatchEvent( new ProgressEvent(ProgressEvent.PROGRESS, false, false, progress, 100));
-		}
 		
 		// ------------------------
 		// PUBLIC METHODS
@@ -120,21 +101,6 @@ package net.sourceforge.flac.codec {
 			start();
 			
 			flacCodec.encode(encodingCompleteHandler, encodingProgressHandler, decodedData, encodedData, decodedData.length, 10);
-		}
-		
-		/**
-		 * Decodes a FLAC encoded audio stream (16 bit 16kHz).
-		 */
-		public function decode(data:ByteArray):void {
-			trace("FLACCodec.decode(data):", data.length);
-			
-			encodedData = data;
-			decodedData = new ByteArray();
-			decodedData.endian = Endian.LITTLE_ENDIAN;
-			
-			start();
-			
-			flacCodec.decode(decodingCompleteHandler, decodingProgressHandler, encodedData, decodedData, encodedData.length, 10);
 		}
 		
 	}
