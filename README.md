@@ -23,7 +23,7 @@ Full Usage of flac.swc at src/net/sourceforge/flac/codec/FLACCodec.as
 
 ### AS3 Code
 
-Methods encode and decode are asyncronous and take as their first params a callback for completed. As well yield param is frequency of loops of processing audio that will be completed before the function calls flyield(). flyeidl(): "This method will force the Alchemy state machine to give up it's time slice. Execution will return to the line following this call on the next Alchemy time-slicing timer tick." - Time slicing timer tick I believe is 1ms. 
+Methods encode and decode are asyncronous and take as their first params a callback for completed. yield is the number of loops of encodign before the program yields to the main process.
 
 Imports
 

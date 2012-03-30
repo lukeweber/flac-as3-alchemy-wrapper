@@ -46,7 +46,7 @@ FLAC__StreamEncoderSeekStatus seekByteArray(const FLAC__StreamEncoder *encoder, 
 	return FLAC__STREAM_ENCODER_SEEK_STATUS_OK;
 }
 
-static void encodeForFlash(void * self, AS3_Val args)
+static AS3_Val encodeForFlash(void * self, AS3_Val args)
 {
 	AS3_Val progress;
 	AS3_Val src, dest;
@@ -92,6 +92,7 @@ static void encodeForFlash(void * self, AS3_Val args)
 	FLAC__stream_encoder_delete(encoder);
 	// Don't remove progess 100 call here, else complete won't be called!
 	AS3_CallT(progress, NULL, "IntType", 100);
+	return AS3_Int(1);
 }
 
 int main(int argc, char **argv)
