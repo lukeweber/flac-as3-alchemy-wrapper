@@ -23,7 +23,13 @@ Full Usage of flac.swc at src/net/sourceforge/flac/codec/FLACCodec.as
 
 ### AS3 Code
 
-Methods encode and decode are asyncronous and take as their first params a callback for completed. yield is the number of loops of encodign before the program yields to the main process.
+Methods encode and decode are asyncronous and take as their first params a
+callback for completed. yield is the number of loops of encodign before the
+program yields to the main process. It should be noted that this encoder accepts
+16bit mono audio at 16000 hz, whereas the flash default is 32bit and the sample
+rate is controlled by mic.rate. If you wish to change this to any other value,
+you could easily just modify the FLAC__stream_encoder_set* inputs in the
+wrapper in c and recompile.
 
 Imports
 
