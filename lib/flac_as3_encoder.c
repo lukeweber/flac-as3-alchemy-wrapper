@@ -15,19 +15,6 @@ int resetPositionByteArray(AS3_Val byteArray)
 	return 0;
 }
 
-FLAC__StreamEncoderReadStatus readByteArray(const FLAC__StreamEncoder *encoder, FLAC__byte dataBuffer[], size_t *bytes, void *writeBuf)
-{
-	int bytesRead = 0;
-	bytesRead = AS3_ByteArray_readBytes((char *)dataBuffer, (AS3_Val)writeBuf, (int)&bytes);
-	if(bytesRead == 0){
-		fprintf(stderr, "readByteArray - end of stream bytes read: %i", (int)&bytes);
-		return FLAC__STREAM_ENCODER_READ_STATUS_END_OF_STREAM;
-	} else {
-		fprintf(stderr, "readByteArray - readContinue after bytes read: %i", (int)&bytes);
-		return FLAC__STREAM_ENCODER_READ_STATUS_CONTINUE;
-	}
-}
-
 FLAC__StreamEncoderWriteStatus writeByteArray(const FLAC__StreamEncoder* encoder, const FLAC__byte dataBuffer[], size_t bytes, unsigned samples, unsigned current_frame, void *writeBuf)
 {
 	fprintf(stderr, "bytes completed, %i, frame %i, samples %i, bufferdata %i", bytes, current_frame, samples, dataBuffer[0]);
@@ -64,24 +51,20 @@ static AS3_Val encodeForFlash(void * self, AS3_Val args)
 	AS3_Val progress;
 	AS3_Val src, dest;
 	FLAC__StreamEncoder* encoder;
-	int srcLen, remainingBytes, bytesRead, yieldTicks, encodeAsOgg;
+	int srcLen, remainingBytes, bytesRead, yieldTicks;
 	FLAC__int32 raw_data[1024];//32 bit, 1024 * 4
 	FLAC__int32 *channels_array[1];
 	short raw_buffer[1024];
 	channels_array[0] = raw_data;
 
-	AS3_ArrayValue(args, "AS3ValType, AS3ValType, AS3ValType, IntType, IntType, IntType", &progress, &src, &dest, &srcLen, &yieldTicks, &encodeAsOgg);
+	AS3_ArrayValue(args, "AS3ValType, AS3ValType, AS3ValType, IntType, IntType", &progress, &src, &dest, &srcLen, &yieldTicks);
 
 	encoder = FLAC__stream_encoder_new();
 	FLAC__stream_encoder_set_channels(encoder, 1);
 	FLAC__stream_encoder_set_bits_per_sample(encoder, 16);
 	FLAC__stream_encoder_set_sample_rate(encoder, 16000);
 	FLAC__stream_encoder_set_total_samples_estimate(encoder, srcLen / sizeof(short));
-	if(encodeAsOgg){
-		FLAC__stream_encoder_init_ogg_stream(encoder, readByteArray, writeByteArray, seekByteArray, tellByteArray, NULL/*metadata callback*/, dest);
-	} else {
-		FLAC__stream_encoder_init_stream(encoder, writeByteArray, seekByteArray, tellByteArray, NULL/*metadata callback*/, dest);
-	}
+	FLAC__stream_encoder_init_stream(encoder, writeByteArray, seekByteArray, tellByteArray, NULL/*metadata callback*/, dest);
 
 	int i = 0;
 	bytesRead = 0;
