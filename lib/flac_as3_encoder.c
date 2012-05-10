@@ -71,9 +71,9 @@ static AS3_Val encodeForFlash(void * self, AS3_Val args)
 	FLAC__stream_encoder_set_sample_rate(encoder, 16000);
 	FLAC__stream_encoder_set_total_samples_estimate(encoder, srcLen / sizeof(short));
 	if(encodeAsOgg){
-		FLAC__stream_encoder_init_stream(encoder, writeByteArray, seekByteArray, tellByteArray, NULL/*metadata callback*/, dest);
-	} else {
 		FLAC__stream_encoder_init_ogg_stream(encoder, readByteArray, writeByteArray, seekByteArray, tellByteArray, NULL/*metadata callback*/, dest);
+	} else {
+		FLAC__stream_encoder_init_stream(encoder, writeByteArray, seekByteArray, tellByteArray, NULL/*metadata callback*/, dest);
 	}
 
 	int i = 0;
