@@ -17,8 +17,13 @@ int resetPositionByteArray(AS3_Val byteArray)
 
 FLAC__StreamEncoderReadStatus readByteArray(const FLAC__StreamEncoder* encoder, const FLAC__byte dataBuffer[], size_t bytes, void *writeBuf)
 {
-	AS3_ByteArray_readBytes((char *)dataBuffer, (AS3_Val)writeBuf, bytes);
-	return FLAC__STREAM_ENCODER_WRITE_STATUS_OK;
+	int bytesRead = 0;
+	bytesRead = AS3_ByteArray_readBytes((char *)dataBuffer, (AS3_Val)writeBuf, bytes);
+	if(bytesRead == 0){
+		return FLAC__STREAM_ENCODER_READ_STATUS_END_OF_STREAM;
+	} else {
+		return FLAC__STREAM_ENCODER_READ_STATUS_CONTINUE;
+	}
 }
 
 FLAC__StreamEncoderWriteStatus writeByteArray(const FLAC__StreamEncoder* encoder, const FLAC__byte dataBuffer[], size_t bytes, unsigned samples, unsigned current_frame, void *writeBuf)
