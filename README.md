@@ -45,7 +45,7 @@ Encode
 
 	encodedData = new ByteArray();
 	encodedData.endian = Endian.LITTLE_ENDIAN;
-	flacCodec.encode(encodingCompleteHandler, encodingProgressHandler, rawPCMByteArray, encodedData, decodedData.length, yield);
+	flacCodec.encode(encodingCompleteHandler, encodingProgressHandler, rawPCMByteArray, encodedData, decodedData.length, yield, enableOggContainer/*0=off raw flac,1=on ogg meta*/);
 
 Progress Handler
 
